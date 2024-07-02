@@ -24,6 +24,17 @@ def generate_initial_data(
         )
         consumers.append(consumer)
 
+    products = []
+    for i in range(1, num_products + 1):
+        product = Product(
+            id=i,
+            name=fake.word(),
+            price=round(random.uniform(10, 150), 2), # in dollars
+            weight=round(random.uniform(0.1, 10), 3), # in kg
+            stock_quantity=random.randint(100, 2000)
+        )
+        products.append(product)
+
     stores = []
     for i in range(1, num_stores + 1):
         store = Store(
@@ -31,20 +42,9 @@ def generate_initial_data(
             cnpj=fake.ssn(),
             name=fake.company(),
             neighborhood=random.choice(neighborhoods),
-            weight_rate=random.uniform(0.1, 0.5)
+            weight_rate=random.uniform(0.1, 0.5),
         )
         stores.append(store)
-
-    products = []
-    for i in range(1, num_products + 1):
-        product = Product(
-            id=i,
-            name=fake.word(),
-            price=random.uniform(10, 100),
-            weight=random.uniform(0.5, 5),
-            stock_quantity=100
-        )
-        products.append(product)
 
     # Convert to DataFrames for easier manipulation
     consumers_df = pd.DataFrame([consumer.__dict__ for consumer in consumers])
@@ -61,7 +61,7 @@ def generate_initial_data(
     products_df.to_csv('src/data/products.csv', index=False)
 
     print("Data generation complete. Consumers, stores, and products saved to CSV.")
-
+    
     return consumers, stores, products
 
 if __name__ == "__main__":
