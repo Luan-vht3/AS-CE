@@ -1,10 +1,7 @@
 import networkx as nx
 import random
 
-def generate_city_graph(
-        neighborhoods: list[str],
-        file_name: str = "src/city_graph.adjlist"
-    ) -> None:
+def generate_city_graph(neighborhoods: list[str]) -> nx.Graph:
     G = nx.Graph()
     G.add_nodes_from(neighborhoods)
 
@@ -16,7 +13,12 @@ def generate_city_graph(
             if neighbor != neighborhood and not G.has_edge(neighborhood, neighbor):
                 G.add_edge(neighborhood, neighbor)
     
-    # Export the graph to a file
-    nx.write_adjlist(G, file_name)
+    print(f"City graph generation complete.")
 
-    print(f"Graph generation complete. City graph saved to {file_name}.")
+    return G
+
+
+if __name__ == "__main__":
+    neighborhoods = [f"N{i}" for i in range(10)]
+    G = generate_city_graph(neighborhoods)
+    print(G.edges)
