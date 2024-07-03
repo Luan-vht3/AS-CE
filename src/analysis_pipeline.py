@@ -4,18 +4,16 @@ import time
 import datetime as dt
 
 def run_analysis_pipeline(spark: SparkSession):
-    # Carregar dados
     orders_df = spark.read.csv("src/data/orders.csv", header=False, inferSchema=True, mode="DROPMALFORMED")
     budgets_df = spark.read.csv("src/data/budgets.csv", header=False, inferSchema=True, mode="DROPMALFORMED")
 
-    # Registrar tabelas temporárias para SQL
     orders_df.createOrReplaceTempView("orders")
     budgets_df.createOrReplaceTempView("budgets")
 
-    # 1. Número de pedidos por minuto na última hora
+    # 1. Number of orders per minute in the last hour
     orders_per_minute_last_hour = spark.sql("""
         SELECT
-            date_format(timestamp, 'yyyy-MM-dd HH:mm') as minute,
+            date_format(timestamp, "%Y-%m-%d %H:%i:%S.%f") as minute,
             count(*) as order_count
         FROM
             orders
@@ -27,10 +25,10 @@ def run_analysis_pipeline(spark: SparkSession):
             minute
     """)
 
-    # 2. Número de orçamentos por minuto na última hora, segmentados por estado
+    # 2. Number of budgets per minute in the last hour, segmented by state
     budgets_per_minute_last_hour = spark.sql("""
         SELECT
-            date_format(timestamp, 'yyyy-MM-dd HH:mm') as minute,
+            date_format(timestamp, "%Y-%m-%d %H:%i:%S.%f") as minute,
             state,
             count(*) as budget_count
         FROM
@@ -43,7 +41,7 @@ def run_analysis_pipeline(spark: SparkSession):
             minute, state
     """)
 
-    # 3. Tabela com informações de cada loja
+    # 3. Table with information about each store
     store_info = spark.sql("""
         SELECT
             store_id,
@@ -61,7 +59,7 @@ def run_analysis_pipeline(spark: SparkSession):
             store_id
     """)
 
-    # 4. Os 10 produtos mais frequentemente em falta na última hora
+    # 4. The 10 products most frequently out of stock in the last hour
     products_out_of_stock_last_hour = spark.sql("""
         SELECT
             product_id,
@@ -77,7 +75,7 @@ def run_analysis_pipeline(spark: SparkSession):
         LIMIT 10
     """)
 
-    # 5. As 5 regiões que mais solicitaram pedidos na última hora
+    # 5. The 5 regions that most requested orders in the last hour
     regions_most_orders_last_hour = spark.sql("""
         SELECT
             consumer_neighborhood as region,
@@ -91,17 +89,12 @@ def run_analysis_pipeline(spark: SparkSession):
         LIMIT 5
     """)
 
-    # Salvar os resultados em arquivos de saída ou persistir em algum armazenamento
-    # Exemplo: salvar em CSV ou em um banco de dados
-    
-    # Exemplo de salvamento em CSV (você pode ajustar conforme necessário)
     orders_per_minute_last_hour.write.csv("output/orders_per_minute_last_hour.csv", mode="overwrite", header=True)
     budgets_per_minute_last_hour.write.csv("output/budgets_per_minute_last_hour.csv", mode="overwrite", header=True)
     store_info.write.csv("output/store_info.csv", mode="overwrite", header=True)
     products_out_of_stock_last_hour.write.csv("output/products_out_of_stock_last_hour.csv", mode="overwrite", header=True)
     regions_most_orders_last_hour.write.csv("output/regions_most_orders_last_hour.csv", mode="overwrite", header=True)
 
-    # Pode ser útil retornar alguns resultados se necessário
     return {
         "orders_per_minute_last_hour": orders_per_minute_last_hour,
         "budgets_per_minute_last_hour": budgets_per_minute_last_hour,
