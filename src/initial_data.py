@@ -4,6 +4,7 @@ import pandas as pd
 from faker import Faker
 from entities import Consumer, Store, Product
 import shutil
+import csv
 
 fake = Faker()
 
@@ -59,6 +60,16 @@ def generate_initial_data(
     consumers_df.to_csv('src/data/consumers.csv', index=False)
     stores_df.to_csv('src/data/stores.csv', index=False)
     products_df.to_csv('src/data/products.csv', index=False)
+
+    # Create empty CSV files for orders and budgets
+    with open('src/data/orders.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['consumer_id', 'store_id', 'product_id', 'quantity', 'registration_time'])
+
+    with open('src/data/budgets.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['id', 'creation_date', 'consumer_id', 'store_id', 'product_id',
+                         'quantity', 'state', 'price', 'registration_time'])
 
     print("Data generation complete. Consumers, stores, and products saved to CSV.")
     

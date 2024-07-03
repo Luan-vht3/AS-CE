@@ -25,7 +25,7 @@ class Store:
     weight_rate: float
 
 @dataclass
-class Quote:
+class Budget:
     id: int
     creation_date: str # "YYYY-MM-DD HH:MM:SS"
     consumer_id: int
@@ -38,3 +38,5 @@ class Quote:
 # base price == product price * quantity
 # shipping price == product weight * quantity * store weight rate * distance from consumer neighborhood to store neighborhood
 # total price == base price + shipping price
+
+# total_price == product.price * quantity + product.weight * quantity * store.weight_rate * distance
